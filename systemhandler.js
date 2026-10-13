@@ -9,10 +9,17 @@ const fileInput = document.getElementById('image-upload');
 const preview = document.getElementById('preview');
 const icon = document.querySelector('.icon');
 const transcribeBtn = document.getElementById('transcribe-btn');
-const statusDiv = document.getElementById('status');
-const resultDiv = document.getElementById('result');
+const uploadView = document.getElementById('upload-view');
+const loadingView = document.getElementById('loading-view');
+const loadingStatus = document.getElementById('loading-status');
+const resultView = document.getElementById('result-view');
+const resultContent = document.getElementById('result-content');
+const goBackBtn = document.getElementById('go-back-btn');
 
 let selectedBase64 = null;
+let sequenceTimeouts = [];
+let timeoutTimer = null;
+let isWaitingResponse = false;
 
 function hexToBytes(hex) {
   const bytes = new Uint8Array(hex.length / 2);
@@ -89,11 +96,6 @@ const client = mqtt.connect(BROKER_URL, {
 
 client.on('connect', () => {
   client.subscribe(TOPIC_RESPONSE);
-  statusDiv.textContent = 'Connected (Encrypted)';
-});
-
-client.on('error', () => {
-  statusDiv.textContent = 'Broker Error';
 });
 
 fileInput.addEventListener('change', (e) => {
@@ -125,20 +127,61 @@ fileInput.addEventListener('change', (e) => {
       preview.classList.remove('hidden');
       icon.classList.add('hidden');
       transcribeBtn.disabled = false;
-      statusDiv.textContent = 'Ready';
-      resultDiv.classList.add('hidden');
-      resultDiv.innerHTML = '';
     };
     img.src = event.target.result;
   };
   reader.readAsDataURL(file);
 });
 
+function clearTimers() {
+  sequenceTimeouts.forEach(clearTimeout);
+  sequenceTimeouts = [];
+  if (timeoutTimer) {
+    clearTimeout(timeoutTimer);
+    timeoutTimer = null;
+  }
+}
+
+function runProgressSequence() {
+  loadingStatus.textContent = 'sending image..';
+
+  sequenceTimeouts.push(
+    setTimeout(() => {
+      loadingStatus.textContent = 'scanining image..';
+    }, 1600)
+  );
+
+  sequenceTimeouts.push(
+    setTimeout(() => {
+      loadingStatus.textContent = 'describing image..';
+    }, 3300)
+  );
+
+  sequenceTimeouts.push(
+    setTimeout(() => {
+      loadingStatus.textContent = 'generaring explanation..';
+    }, 5000)
+  );
+}
+
 transcribeBtn.addEventListener('click', async () => {
   if (!selectedBase64) return;
 
-  transcribeBtn.disabled = true;
-  statusDiv.textContent = 'Encrypting & Sending...';
+  uploadView.classList.add('hidden');
+  resultView.classList.add('hidden');
+  loadingView.classList.remove('hidden');
+
+  isWaitingResponse = true;
+  clearTimers();
+  runProgressSequence();
+
+  timeoutTimer = setTimeout(() => {
+    if (isWaitingResponse) {
+      isWaitingResponse = false;
+      clearTimers();
+      showErrorState('error servers are busy');
+    }
+  }, 400000);
 
   const unencryptedJson = JSON.stringify({
     clientId: clientId,
@@ -150,18 +193,33 @@ transcribeBtn.addEventListener('click', async () => {
 });
 
 client.on('message', async (topic, message) => {
-  if (topic === TOPIC_RESPONSE) {
+  if (topic === TOPIC_RESPONSE && isWaitingResponse) {
+    isWaitingResponse = false;
+    clearTimers();
+
     try {
       const decryptedJson = await decryptPayload(message.toString());
       const data = JSON.parse(decryptedJson);
-      renderFormattedText(data.text || decryptedJson);
+      showSuccessState(data.text || decryptedJson);
     } catch {
-      renderFormattedText('Decryption Failed');
+      showErrorState('error servers are busy');
     }
-    statusDiv.textContent = '';
-    transcribeBtn.disabled = false;
   }
 });
+
+function showSuccessState(rawText) {
+  loadingView.classList.add('hidden');
+  resultContent.classList.remove('error-text');
+  renderFormattedText(rawText);
+  resultView.classList.remove('hidden');
+}
+
+function showErrorState(errorMsg) {
+  loadingView.classList.add('hidden');
+  resultContent.classList.add('error-text');
+  resultContent.textContent = errorMsg;
+  resultView.classList.remove('hidden');
+}
 
 function renderFormattedText(rawText) {
   const formatted = rawText
@@ -172,6 +230,24 @@ function renderFormattedText(rawText) {
     .replace(/"([^"]+)"/g, '&ldquo;$1&rdquo;')
     .replace(/\n/g, '<br>');
 
-  resultDiv.innerHTML = formatted;
-  resultDiv.classList.remove('hidden');
+  resultContent.innerHTML = formatted;
 }
+
+goBackBtn.addEventListener('click', () => {
+  clearTimers();
+  isWaitingResponse = false;
+
+  selectedBase64 = null;
+  fileInput.value = '';
+  preview.src = '';
+  preview.classList.add('hidden');
+  icon.classList.remove('hidden');
+  transcribeBtn.disabled = true;
+
+  resultContent.innerHTML = '';
+  resultContent.classList.remove('error-text');
+
+  loadingView.classList.add('hidden');
+  resultView.classList.add('hidden');
+  uploadView.classList.remove('hidden');
+});
