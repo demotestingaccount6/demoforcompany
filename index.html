@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo Test</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <main class="app-container">
+    <header class="header">
+      <h1>Demo Test</h1>
+      <p>Easily upload and manage your images</p>
+    </header>
+
+    <section class="upload-card">
+     
+      <input 
+        type="file" 
+        id="image-upload" 
+        name="images" 
+        accept="image/*" 
+        multiple 
+      />
+
+      <label for="image-upload" class="dropzone">
+        <div class="icon-container">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        
+        <h2>Choose Images to Upload</h2>
+        <p class="dropzone-text">Tap here or drag & drop files</p>
+        
+        <span class="btn-upload">Browse Images</span>
+        <span class="file-hint">Supports: PNG, JPG, WEBP, GIF</span>
+      </label>
+    </section>
+
+    <section class="preview-container" id="preview-container">
+
+    </section>
+  </main>
+
+</body>
+</html>
