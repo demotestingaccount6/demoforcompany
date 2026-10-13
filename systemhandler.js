@@ -6,9 +6,10 @@ const TOPIC_REQUEST = 'demotest/secure/request';
 const TOPIC_RESPONSE = 'demotest/secure/response/' + clientId;
 
 const fileInput = document.getElementById('image-upload');
+const userPrompt = document.getElementById('user-prompt');
 const preview = document.getElementById('preview');
 const icon = document.querySelector('.icon');
-const explainBtn = document.getElementById('explain-btn') || document.getElementById('transcribe-btn');
+const sendBtn = document.getElementById('send-btn') || document.getElementById('explain-btn') || document.getElementById('transcribe-btn');
 const uploadView = document.getElementById('upload-view');
 const loadingView = document.getElementById('loading-view');
 const loadingStatus = document.getElementById('loading-status');
@@ -89,6 +90,14 @@ async function decryptPayload(b64) {
   return new TextDecoder().decode(decrypted);
 }
 
+function checkInputs() {
+  const hasText = userPrompt && userPrompt.value.trim().length > 0;
+  const hasImage = !!selectedBase64;
+  if (sendBtn) {
+    sendBtn.disabled = !(hasText || hasImage);
+  }
+}
+
 const client = mqtt.connect(BROKER_URL, {
   clientId: clientId,
   clean: true
@@ -97,6 +106,10 @@ const client = mqtt.connect(BROKER_URL, {
 client.on('connect', () => {
   client.subscribe(TOPIC_RESPONSE);
 });
+
+if (userPrompt) {
+  userPrompt.addEventListener('input', checkInputs);
+}
 
 if (fileInput) {
   fileInput.addEventListener('change', (e) => {
@@ -131,9 +144,7 @@ if (fileInput) {
         if (icon) {
           icon.classList.add('hidden');
         }
-        if (explainBtn) {
-          explainBtn.disabled = false;
-        }
+        checkInputs();
       };
       img.src = event.target.result;
     };
@@ -183,9 +194,10 @@ function runProgressSequence() {
   );
 }
 
-if (explainBtn) {
-  explainBtn.addEventListener('click', async () => {
-    if (!selectedBase64) return;
+if (sendBtn) {
+  sendBtn.addEventListener('click', async () => {
+    const textVal = userPrompt ? userPrompt.value.trim() : '';
+    if (!selectedBase64 && !textVal) return;
 
     if (uploadView) uploadView.classList.add('hidden');
     if (resultView) resultView.classList.add('hidden');
@@ -205,7 +217,8 @@ if (explainBtn) {
 
     const unencryptedJson = JSON.stringify({
       clientId: clientId,
-      image: selectedBase64
+      prompt: textVal,
+      image: selectedBase64 || ''
     });
 
     const encryptedData = await encryptPayload(unencryptedJson);
@@ -265,13 +278,14 @@ if (goBackBtn) {
     isWaitingResponse = false;
 
     selectedBase64 = null;
+    if (userPrompt) userPrompt.value = '';
     if (fileInput) fileInput.value = '';
     if (preview) {
       preview.src = '';
       preview.classList.add('hidden');
     }
     if (icon) icon.classList.remove('hidden');
-    if (explainBtn) explainBtn.disabled = true;
+    if (sendBtn) sendBtn.disabled = true;
 
     if (resultContent) {
       resultContent.innerHTML = '';
