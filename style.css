@@ -1,4 +1,3 @@
-
 * {
   margin: 0;
   padding: 0;
@@ -6,69 +5,39 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   background-color: #f3f4f6;
   color: #1f2937;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1.25rem;
+  padding: 1.5rem;
 }
 
-.app-container {
+.card {
   width: 100%;
-  max-width: 540px;
+  max-width: 440px;
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
   padding: 2rem;
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 1.75rem;
-}
-
-.header h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #111827;
-  text-transform: capitalize;
-}
-
-.header p {
-  color: #6b7280;
-  font-size: 0.95rem;
-  margin-top: 0.35rem;
-}
-
-/* --- Hide Default File Input --- */
-#image-upload {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
-}
-
-/* --- Dropzone / Upload Area --- */
-.dropzone {
   display: flex;
   flex-direction: column;
+  gap: 1.25rem;
+}
+
+.dropzone {
+  display: flex;
   align-items: center;
   justify-content: center;
   border: 2px dashed #d1d5db;
   border-radius: 12px;
-  padding: 2.5rem 1.5rem;
-  text-align: center;
+  min-height: 200px;
   cursor: pointer;
   background-color: #f9fafb;
-  transition: all 0.2s ease-in-out;
-  -webkit-tap-highlight-color: transparent; /* Cleaner tap for mobile */
+  transition: border-color 0.2s, background-color 0.2s;
+  overflow: hidden;
 }
 
 .dropzone:hover {
@@ -76,75 +45,65 @@ body {
   background-color: #f5f3ff;
 }
 
-/* --- Upload Icon --- */
-.icon-container {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background-color: #eef2ff;
+.icon {
   color: #4f46e5;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
-  transition: transform 0.2s ease;
 }
 
-.dropzone:hover .icon-container {
-  transform: translateY(-2px);
+#preview {
+  width: 100%;
+  height: 100%;
+  max-height: 260px;
+  object-fit: contain;
 }
 
-/* --- Text & Button --- */
-.dropzone h2 {
-  font-size: 1.15rem;
+#transcribe-btn {
+  width: 100%;
+  padding: 0.85rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: #111827;
-}
-
-.dropzone-text {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-top: 0.25rem;
-}
-
-.btn-upload {
-  margin-top: 1.25rem;
-  display: inline-block;
-  background-color: #4f46e5;
   color: #ffffff;
-  padding: 0.65rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 500;
+  background-color: #4f46e5;
+  border: none;
   border-radius: 8px;
-  transition: background-color 0.2s ease;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
 }
 
-.dropzone:hover .btn-upload {
+#transcribe-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+#transcribe-btn:not(:disabled):hover {
   background-color: #4338ca;
 }
 
-.file-hint {
-  font-size: 0.75rem;
-  color: #9ca3af;
-  margin-top: 0.85rem;
+#status {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-align: center;
+  min-height: 1.2rem;
 }
 
-/* --- Responsive Adjustments --- */
-@media (max-width: 480px) {
-  .app-container {
-    padding: 1.5rem 1rem;
-    border-radius: 12px;
-  }
+#result {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #334155;
+  word-break: break-word;
+}
 
-  .dropzone {
-    padding: 2rem 1rem;
-  }
+#result strong {
+  color: #0f172a;
+}
 
-  .header h1 {
-    font-size: 1.5rem;
-  }
-
-  .btn-upload {
-    width: 100%;
-  }
+.hidden {
+  display: none !important;
 }
