@@ -172,7 +172,7 @@ function runProgressSequence() {
   sequenceTimeouts.push(
     setTimeout(() => {
       if (isWaitingResponse) {
-        loadingStatus.textContent = 'Scanning image...';
+        loadingStatus.textContent = 'Scanning...';
       }
     }, delay1)
   );
@@ -180,7 +180,7 @@ function runProgressSequence() {
   sequenceTimeouts.push(
     setTimeout(() => {
       if (isWaitingResponse) {
-        loadingStatus.textContent = 'Describing image...';
+        loadingStatus.textContent = 'Understanding...';
       }
     }, delay2)
   );
@@ -188,7 +188,7 @@ function runProgressSequence() {
   sequenceTimeouts.push(
     setTimeout(() => {
       if (isWaitingResponse) {
-        loadingStatus.textContent = 'Generating explanation...';
+        loadingStatus.textContent = 'Generating Response...';
       }
     }, delay3)
   );
