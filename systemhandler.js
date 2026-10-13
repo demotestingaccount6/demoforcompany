@@ -8,7 +8,7 @@ const TOPIC_RESPONSE = 'demotest/secure/response/' + clientId;
 const fileInput = document.getElementById('image-upload');
 const preview = document.getElementById('preview');
 const icon = document.querySelector('.icon');
-const transcribeBtn = document.getElementById('transcribe-btn');
+const explainBtn = document.getElementById('explain-btn');
 const uploadView = document.getElementById('upload-view');
 const loadingView = document.getElementById('loading-view');
 const loadingStatus = document.getElementById('loading-status');
@@ -107,7 +107,7 @@ fileInput.addEventListener('change', (e) => {
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      const maxDim = 800;
+      const maxDim = 680;
       let w = img.width;
       let h = img.height;
       if (w > h && w > maxDim) {
@@ -122,11 +122,11 @@ fileInput.addEventListener('change', (e) => {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
 
-      selectedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+      selectedBase64 = canvas.toDataURL('image/jpeg', 0.6);
       preview.src = selectedBase64;
       preview.classList.remove('hidden');
       icon.classList.add('hidden');
-      transcribeBtn.disabled = false;
+      explainBtn.disabled = false;
     };
     img.src = event.target.result;
   };
@@ -143,28 +143,38 @@ function clearTimers() {
 }
 
 function runProgressSequence() {
-  loadingStatus.textContent = 'sending image..';
+  loadingStatus.textContent = 'Sending image...';
+
+  const delay1 = 1000 + Math.random() * 1000;
+  const delay2 = delay1 + 1000 + Math.random() * 1000;
+  const delay3 = delay2 + 1000 + Math.random() * 1000;
 
   sequenceTimeouts.push(
     setTimeout(() => {
-      loadingStatus.textContent = 'scanining image..';
-    }, 1600)
+      if (isWaitingResponse) {
+        loadingStatus.textContent = 'Scanning image...';
+      }
+    }, delay1)
   );
 
   sequenceTimeouts.push(
     setTimeout(() => {
-      loadingStatus.textContent = 'describing image..';
-    }, 3300)
+      if (isWaitingResponse) {
+        loadingStatus.textContent = 'Describing image...';
+      }
+    }, delay2)
   );
 
   sequenceTimeouts.push(
     setTimeout(() => {
-      loadingStatus.textContent = 'generaring explanation..';
-    }, 5000)
+      if (isWaitingResponse) {
+        loadingStatus.textContent = 'Generating explanation...';
+      }
+    }, delay3)
   );
 }
 
-transcribeBtn.addEventListener('click', async () => {
+explainBtn.addEventListener('click', async () => {
   if (!selectedBase64) return;
 
   uploadView.classList.add('hidden');
@@ -242,10 +252,15 @@ goBackBtn.addEventListener('click', () => {
   preview.src = '';
   preview.classList.add('hidden');
   icon.classList.remove('hidden');
-  transcribeBtn.disabled = true;
+  explainBtn.disabled = true;
 
   resultContent.innerHTML = '';
   resultContent.classList.remove('error-text');
+
+  loadingView.classList.add('hidden');
+  resultView.classList.add('hidden');
+  uploadView.classList.remove('hidden');
+});
 
   loadingView.classList.add('hidden');
   resultView.classList.add('hidden');
