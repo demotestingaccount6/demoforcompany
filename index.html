@@ -9,22 +9,32 @@
 <body>
 
   <main class="card">
-    <input type="file" id="image-upload" accept="image/*" hidden />
-    
-    <label for="image-upload" class="dropzone" id="dropzone">
-      <div class="icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="17 8 12 3 7 8"/>
-          <line x1="12" y1="3" x2="12" y2="15"/>
-        </svg>
-      </div>
-      <img id="preview" alt="Preview" class="hidden" />
-    </label>
+    <section id="upload-view">
+      <input type="file" id="image-upload" accept="image/*" hidden />
+      
+      <label for="image-upload" class="dropzone" id="dropzone">
+        <div class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <img id="preview" alt="Preview" class="hidden" />
+      </label>
 
-    <button id="transcribe-btn" disabled>Transcribe</button>
-    <div id="status"></div>
-    <div id="result" class="hidden"></div>
+      <button id="transcribe-btn" disabled>Transcribe</button>
+    </section>
+
+    <section id="loading-view" class="hidden">
+      <div class="spinner"></div>
+      <p id="loading-status">sending image..</p>
+    </section>
+
+    <section id="result-view" class="hidden">
+      <div id="result-content"></div>
+      <button id="go-back-btn" class="action-btn">Go Back</button>
+    </section>
   </main>
 
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
