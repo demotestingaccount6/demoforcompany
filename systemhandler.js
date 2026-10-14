@@ -163,7 +163,7 @@ function clearTimers() {
 
 function runProgressSequence() {
   if (!loadingStatus) return;
-  loadingStatus.textContent = 'Sending image...';
+  loadingStatus.textContent = 'Sending...';
 
   const delay1 = 1000 + Math.random() * 1000;
   const delay2 = delay1 + 1000 + Math.random() * 1000;
